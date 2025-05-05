@@ -30,7 +30,7 @@ const Page = () => {
 
   return (
     <div className="w-full flex justify-center">
-      <div className="w-full sm:w-auto text-left flex justify-center rounded-md px-4 py-8 sm:p-10 shadow-xl bg-white">
+      <div className="w-full mt-10 sm:w-auto text-left flex justify-center rounded-md px-4 py-8 sm:p-10 shadow-xl bg-white">
         <div className="w-full">
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold font-serif text-blue-500">Login</h2>

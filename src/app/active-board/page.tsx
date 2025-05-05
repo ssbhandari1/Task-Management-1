@@ -26,7 +26,7 @@ const Page = () => {
 
   return (
     <div className="text-black p-6">
-      <h1 className="text-3xl font-bold mb-6">Active Board</h1>
+      <h1 className="text-3xl font-bold mb-6 text-white">Active Board</h1>
 
       <div className="flex gap-6">
         <TaskColumn title="Pending" tasks={groupedTasks['Pending']} statusColor="bg-yellow-500" />

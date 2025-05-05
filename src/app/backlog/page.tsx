@@ -5,6 +5,9 @@ import { Task } from "@/types/task";
 import { useAppDispatch } from "@/hooks/redux.hooks";
 import { createTaskThunk, deleteTaskThunk, updateTaskThunk } from "@/redux/task/thunk";
 import useGetTask from "@/hooks/task/useGetTask";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+
 
 
 const Page = () => {
@@ -15,7 +18,7 @@ const Page = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   // Delete Task
-  const deleteTask = async(id: string) => {
+  const deleteTask = async (id: string) => {
     await dispatch(deleteTaskThunk(id))
   };
 
@@ -66,31 +69,28 @@ const Page = () => {
       <div>
         {tasks?.map((task) => (
           <div key={task?._id} className="bg-white p-6 mb-6 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
-            <h3 className="text-xl font-semibold text-gray-800 hover:text-blue-400 transition-colors">{task.title}</h3>
+            <h3 className="text-xl font-semibold text-gray-500 transition-colors">{task.title}</h3>
+            <div>
             <p className="text-sm text-gray-600 mt-2">{task?.description}</p>
-
-            <div className="mt-4 flex justify-between text-sm text-gray-500">
-              <div>
-                <span className="font-semibold">Status:</span> {task?.status}
-              </div>
-              <div>
-                <span className="font-semibold">Due Date:</span> {task?.dueDate}
-              </div>
             </div>
 
-            <div className="mt-4 flex justify-end space-x-4">
-              <button
-                onClick={() => openEditModal(task)}
-                className="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-5 py-2 rounded-md hover:from-blue-500 hover:to-blue-400 transition-all duration-300"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => deleteTask(task?._id)}
-                className="bg-gradient-to-r from-red-400 to-red-500 text-white px-5 py-2 rounded-md hover:from-red-500 hover:to-red-400 transition-all duration-300"
-              >
-                Delete
-              </button>
+            <div className="mt-4 justify-between flex just">
+              <div className="flex gap-4 text-sm text-gray-500">
+                <span className="font-semibold">Status:</span> {task?.status}
+                <span className="font-semibold">Due Date:</span> {task?.dueDate}
+              </div>
+              <div className="flex gap-3">
+                <FaEdit
+                  onClick={() => openEditModal(task)}
+                  className="text-blue-500 text-2xl"
+                />
+                <MdDelete
+                  onClick={() => deleteTask(task?._id)}
+                  className="text-red-500 text-2xl"
+                />
+
+              </div>
+
             </div>
           </div>
         ))}

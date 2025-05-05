@@ -16,9 +16,9 @@ const UiLayoutProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="w-full h-screen">
-      <Header />
+      <Header toggleSidebar={toggleSidebar}/>
       <div className="flex w-full h-[90vh] bg-slate-900">
-        {isAuthenticated && <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />}
+        {isAuthenticated && <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar}/>}
         <div className="flex-1 overflow-x-auto">
           {isAuthenticated && <Navbar />}
           {/*  */}

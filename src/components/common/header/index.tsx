@@ -7,8 +7,10 @@ import Loading from '../loading';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux.hooks';
 import axios from 'axios';
 import { verifyAuth } from '@/redux/auth/thunk';
+import { GiHamburgerMenu } from 'react-icons/gi';
 
-const Header = () => {
+
+const Header = ({toggleSidebar}) => {
   const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch()
    const pathName = usePathname();
@@ -38,7 +40,11 @@ const Header = () => {
 
   return (
     <nav className="flex items-center justify-between py-3 px-4 bg-blue-900 text-white shadow-md">
-      <h1 className="font-semibold text-xl">Task Management</h1>
+      <h1 className="hidden lg:block font-semibold text-xl">Task Management</h1>
+      <GiHamburgerMenu
+				className="block lg:hidden text-[1.4rem] cursor-pointer xl:hidden"
+				onClick={toggleSidebar}
+			/>
       {
         pathName === '/auth/login' || pathName === '/auth/signup' ?
           <></> :
