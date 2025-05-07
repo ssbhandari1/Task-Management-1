@@ -8,21 +8,25 @@ export const createTask = async (
   description: string,
   status: string,
   dueDate: string,
-  userId: string
+  createdBy: string,
+  assignedTo?: string
 ) => {
   try {
     await connectToDB();
 
-    const objectId = new mongoose.Types.ObjectId(userId);
-
-    const newTask: ITask = new Task({
+    const taskData: Partial<ITask> = {
       title,
       description,
       status,
       dueDate,
-      userId: objectId,
-    });
+      createdBy: new mongoose.Types.ObjectId(createdBy),
+    };
 
+    if (assignedTo) {
+      taskData.assignedTo = new mongoose.Types.ObjectId(assignedTo);
+    }
+
+    const newTask = new Task(taskData);
     await newTask.save();
 
     return newTask;
@@ -31,10 +35,11 @@ export const createTask = async (
   }
 };
 
+
 export const getTasks = async (userId: string) => {
   try {
     await connectToDB();
-    const tasks = await Task.find({userId});
+    const tasks = await Task.find({ userId });
     return tasks;
   } catch (error) {
     console.log(error)
@@ -42,19 +47,36 @@ export const getTasks = async (userId: string) => {
   }
 };
 
+
+export const getAllTasks = async () => {
+  try {
+    await connectToDB();
+
+    return await Task.find()
+      .populate("createdBy", "username email")
+      .populate("assignedTo", "username email")
+      .lean();
+  } catch (error) {
+    throw new Error("Error fetching all tasks: " + error);
+  }
+};
+
 export const deleteTask = async (taskId: string) => {
   await connectToDB();
-  
+
   const deletedTask = await Task.findByIdAndDelete(taskId);
-  
+
   return deletedTask;
 };
 
 
 export const updateTask = async (taskId: string, updatedData: Partial<ITask>) => {
   await connectToDB();
-  
-  const updatedTask = await Task.findByIdAndUpdate(taskId, updatedData, { new: true });
 
+  const updatedTask = await Task.findByIdAndUpdate(
+    taskId,
+    updatedData,
+    { new: true }
+  ).populate("assignedTo");
   return updatedTask;
 };

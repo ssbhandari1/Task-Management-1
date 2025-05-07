@@ -1,7 +1,7 @@
 import { deleteTask, updateTask } from "@/service/task";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function DELETE(req: NextRequest, context: { params: { taskId: string } }) {
+export async function DELETE(req: NextRequest, context: { params }) {
   try {
     const { taskId } = context.params;
 
@@ -22,32 +22,36 @@ export async function DELETE(req: NextRequest, context: { params: { taskId: stri
   }
 }
 
+
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Record<string, string> }
+  context: { params }
 ) {
   try {
-    const taskId = params.taskId;
+    const { taskId } = context.params;
 
-    if (!taskId) {
-      return NextResponse.json({ message: "Task ID is missing" }, { status: 400 });
-    }
-
-    const { title, description, status, dueDate } = await req.json();
+    const { title, description, status, dueDate, assigneeId } = await req.json();
 
     if (!title || !description || !status || !dueDate) {
       return NextResponse.json({ message: "All fields are required" }, { status: 400 });
     }
 
-    const updatedTask = await updateTask(taskId, { title, description, status, dueDate });
+    const updatedTask = await updateTask(taskId, {
+      title,
+      description,
+      status,
+      dueDate,
+      ...(assigneeId && { assignedTo: assigneeId }),
+    });
 
     if (!updatedTask) {
       return NextResponse.json({ message: "Task not found" }, { status: 404 });
     }
 
-    return NextResponse.json(updatedTask, { status: 200 });
+    return NextResponse.json(updatedTask);
   } catch (error) {
-    console.error("PUT request error:", error);
-    return NextResponse.json({ message: "Error updating task" }, { status: 500 });
+    console.error("PUT error:", error);
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
+

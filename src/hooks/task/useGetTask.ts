@@ -1,24 +1,17 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux.hooks";
-import { getUserTaksThunk } from "@/redux/task/thunk";
+import { getAllTasksThunk } from "@/redux/task/thunk";
 
 const useGetTask = () => {
   const dispatch = useAppDispatch();
-  const { tasks } = useAppSelector((state) => state.tasks);
+  const { tasks, hasFetched } = useAppSelector((state) => state.tasks);
   const { user } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    if (user?.id && (!tasks || tasks.length === 0)) {
-      const fetchUserTasks = async () => {
-        try {
-          await dispatch(getUserTaksThunk(user.id));
-        } catch (error) {
-          console.error("Error fetching user tasks:", error);
-        }
-      };
-      fetchUserTasks();
+    if (user?.id && !hasFetched) {
+      dispatch(getAllTasksThunk());
     }
-  }, [user?.id, tasks, dispatch]);
+  }, [user?.id, hasFetched, dispatch]);
 
   return { tasks, user };
 };

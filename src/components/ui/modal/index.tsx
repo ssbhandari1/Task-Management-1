@@ -1,29 +1,35 @@
-import { Task } from '@/types/task';
+import { Task, TaskFormData } from '@/types/task';
+import { User } from '@/types/user';
 import React, { useState } from 'react'
 
 
+
 type ModalProps = {
-  task: Task;
+  task?: Task;
+  users: User[];
   onClose: () => void;
-  onSave: (updatedTask: Task) => void;
+  onSave: (data: TaskFormData, taskId?: string) => void;
 };
-const Modal = ({ task, onClose, onSave }: ModalProps) => {
-  const [formData, setFormData] = useState({
-    title: task.title || "",
-    description: task.description || "",
-    status: task.status || "Pending",
-    dueDate: task.dueDate || "",
+
+const Modal = ({ task, users, onClose, onSave }: ModalProps) => {
+  const [formData, setFormData] = useState<TaskFormData>({
+    title: task?.title || "",
+    description: task?.description || "",
+    status: task?.status || "Pending",
+    dueDate: task?.dueDate || "",
+    assigneeId: task?.assignedTo?._id || "", // NOTE: map from assignedTo
   });
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSave = () => {
-    const updatedTask = { ...task, ...formData };
-    onSave(updatedTask);
+    onSave(formData, task?._id);
     onClose();
   };
+
 
   return (
     <div className="fixed inset-0 bg-gray-500/50 flex justify-center items-center z-50">
@@ -65,6 +71,32 @@ const Modal = ({ task, onClose, onSave }: ModalProps) => {
             <option value="Completed">Completed</option>
           </select>
         </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Select Assignee</label>
+          <select
+            name="assigneeId"
+            value={formData.assigneeId}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded mt-1"
+          >
+            {!formData.assigneeId && (
+              <option value="">Select Assignee</option>
+            )}
+            {formData.assigneeId && (
+              <option value={formData.assigneeId} disabled>
+                {users.find((u) => u._id === formData.assigneeId)?.email || "Current Assignee"}
+              </option>
+            )}
+            {users
+              .filter((u) => u._id !== formData.assigneeId) // don't repeat selected one
+              .map((u) => (
+                <option key={u._id} value={u._id}>
+                  {u.email}
+                </option>
+              ))}
+          </select>
+        </div>
+
 
         <div className="mb-4">
           <label className="block text-sm font-medium">Due Date</label>

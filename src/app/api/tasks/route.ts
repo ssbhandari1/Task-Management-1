@@ -23,19 +23,14 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
-      return NextResponse.json({ message: "User ID is required" }, { status: 400 });
-    }
-
-    const { title, description, status, dueDate } = await req.json();
-
-    if (!title || !description || !status || !dueDate) {
+    const { title, description, status, dueDate, assigneeId } = await req.json();
+    const creatorId = searchParams.get("userId");
+    
+    if (!creatorId || !assigneeId || !title || !description || !status || !dueDate) {
       return NextResponse.json({ message: "All fields are required" }, { status: 400 });
     }
-
-    const newTask = await createTask(title, description, status, dueDate, userId);
+    
+    const newTask = await createTask(title, description, status, dueDate, creatorId, assigneeId); 
 
     return NextResponse.json(newTask, { status: 201 });
   } catch (error) {

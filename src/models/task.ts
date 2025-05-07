@@ -5,8 +5,8 @@ export interface ITask extends Document {
   description: string;
   status: string;
   dueDate: string;
-  userId: mongoose.Types.ObjectId;
-  
+  createdBy: mongoose.Types.ObjectId;
+  assignedTo?: mongoose.Types.ObjectId;
 }
 
 const TaskSchema = new Schema<ITask>({
@@ -14,8 +14,10 @@ const TaskSchema = new Schema<ITask>({
   description: { type: String, required: true },
   status: { type: String, enum: ['Pending', 'In Progress', 'Completed'], required: true },
   dueDate: { type: String, required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
+
 
 const Task = mongoose.models.Task || mongoose.model<ITask>('Task', TaskSchema);
 

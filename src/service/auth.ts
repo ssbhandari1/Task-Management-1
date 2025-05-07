@@ -30,7 +30,13 @@ export const getUser = async (email: string) => {
   }
 };
 
-
+export const getAllUsers = async () => {
+  try {
+    return await User.find().select("_id username email").lean();
+  } catch (error) {
+    throw new Error("Error fetching users: " + error);
+  }
+};
 
 
 // Handle Sign Up logic
@@ -101,5 +107,5 @@ export const logInUser = async (email: string, password: string) => {
 
 
 export const getUserById = async (userId: string) => {
-  return await User.findById(userId).select("_id name email");
+  return await User.findById(userId).select("_id username email");
 };

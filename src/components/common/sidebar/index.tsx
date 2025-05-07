@@ -10,8 +10,7 @@ interface SidebarProps {
 
 const menuItems = [
   { label: 'Backlog', href: '/backlog' },
-  { label: 'Active Board', href: '/active-board' },
-  { label: 'Task', href: '/task' },
+  { label: 'Active Board', href: '/active-board' }
 ];
 
 interface SidebarContentProps {

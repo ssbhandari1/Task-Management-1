@@ -1,22 +1,32 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createTaskThunk, deleteTaskThunk, getUserTaksThunk, updateTaskThunk } from "../thunk";
+import { createTaskThunk, deleteTaskThunk, getAllTasksThunk, getUserTaksThunk, updateTaskThunk } from "../thunk";
 
-interface Task {
+export interface User {
+  _id: string;
+  username: string;
+  email: string;
+}
+
+export interface Task {
   _id: string;
   title: string;
   description: string;
   status: string;
   dueDate: string;
+  assignedTo?: User;   // optional in case not assigned
+  createdBy: User;
 }
 
 interface TaskState {
   tasks: Task[];
   loading: boolean;
+  hasFetched:boolean;
   error: string | null;
 }
 
 const initialState: TaskState = {
   tasks: [],
+  hasFetched: false,
   loading: false,
   error: null,
 };
@@ -42,6 +52,12 @@ const taskSlice = createSlice({
       .addCase(getUserTaksThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.tasks = action.payload;
+        state.hasFetched = true;
+      })
+      .addCase(getAllTasksThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tasks = action.payload;
+        state.hasFetched = true;
       })
       .addCase(deleteTaskThunk.pending, (state) => {
         state.loading = true;

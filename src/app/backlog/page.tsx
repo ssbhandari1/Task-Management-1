@@ -1,18 +1,20 @@
 'use client'
 import React, { useState } from "react";
 import Modal from "@/components/ui/modal";
-import { Task } from "@/types/task";
+import { Task, TaskFormData } from "@/types/task";
 import { useAppDispatch } from "@/hooks/redux.hooks";
 import { createTaskThunk, deleteTaskThunk, updateTaskThunk } from "@/redux/task/thunk";
 import useGetTask from "@/hooks/task/useGetTask";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import useGetUsers from "@/hooks/user/useGetUser";
 
 
 
 const Page = () => {
   const dispatch = useAppDispatch();
   const { tasks, user } = useGetTask();
+  const { users } = useGetUsers()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -42,13 +44,11 @@ const Page = () => {
     setTaskToEdit(null);
   };
 
-  const saveTask = async (updatedTask: Task) => {
-    if (isEditing) {
-      // Call update thunk when editing an existing task
-      await dispatch(updateTaskThunk({ taskId: updatedTask?._id, updatedTask })).unwrap();
+  const saveTask = async (formData: TaskFormData, taskId?: string) => {
+    if (isEditing && taskId) {
+      await dispatch(updateTaskThunk({ taskId, updatedTask: formData })).unwrap();
     } else {
-      // Call create thunk when adding a new task
-      await dispatch(createTaskThunk({ updatedTask, id: user?.id })).unwrap();
+      await dispatch(createTaskThunk({ updatedTask: formData, id: user?.id })).unwrap();
     }
     closeModal();
   };
@@ -67,39 +67,47 @@ const Page = () => {
 
 
       <div>
-        {tasks?.map((task) => (
-          <div key={task?._id} className="bg-white p-6 mb-6 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
-            <h3 className="text-xl font-semibold text-gray-500 transition-colors">{task.title}</h3>
-            <div>
-            <p className="text-sm text-gray-600 mt-2">{task?.description}</p>
-            </div>
 
-            <div className="mt-4 justify-between flex just">
-              <div className="flex gap-4 text-sm text-gray-500">
-                <span className="font-semibold">Status:</span> {task?.status}
-                <span className="font-semibold">Due Date:</span> {task?.dueDate}
-              </div>
-              <div className="flex gap-3">
-                <FaEdit
-                  onClick={() => openEditModal(task)}
-                  className="text-blue-500 text-2xl"
-                />
-                <MdDelete
-                  onClick={() => deleteTask(task?._id)}
-                  className="text-red-500 text-2xl"
-                />
-
+        {tasks?.map((task) => {
+          const assigneeInitial = task.assignedTo?.username?.charAt(0).toUpperCase();
+          return (
+            <div key={task?._id} className="bg-white p-6 mb-6 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
+              <h3 className="text-xl font-semibold text-gray-500 transition-colors">{task.title}</h3>
+              <div className="py-3">
+                <p className="text-sm text-gray-600 mt-2">{task?.description}</p>
               </div>
 
+              <div className="mt-4 justify-between flex just">
+                <div className="flex gap-4 text-sm text-gray-500">
+                  <span className="font-semibold">Status:</span> {task?.status}
+                  <span className="font-semibold">Due Date:</span> {task?.dueDate}
+                </div>
+                <div className="flex gap-3 items-center justify-center">
+                  <FaEdit
+                    onClick={() => openEditModal(task)}
+                    className="text-blue-500 text-2xl cursor-pointer"
+                  />
+                  <MdDelete
+                    onClick={() => deleteTask(task?._id)}
+                    className="text-red-500 text-2xl cursor-pointer"
+                  />
+                  <div className="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-sm font-bold">
+                    {assigneeInitial}
+                  </div>
+                </div>
+
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        }
+        )}
       </div>
 
       {/* Modal */}
       {isModalOpen && (
         <Modal
-          task={taskToEdit || { title: "", description: "", status: "Pending", dueDate: "" }} // Empty task for new entries
+          task={taskToEdit || undefined}
+          users={users}
           onClose={closeModal}
           onSave={saveTask}
         />
